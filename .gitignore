@@ -1,0 +1,12 @@
+# Archivos compilados de C++
+*.exe
+*.out
+*.o
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Archivos JSON de estado (cambian a cada segundo, no los subas)
+state.json
+input.json
