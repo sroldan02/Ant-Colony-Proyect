@@ -1,6 +1,6 @@
 # ============================================================
-# Team: Ant Colony | Variant 13
-# Members: Juan Camilo Méndez, Jonathan David Moreno, Salomé Roldán
+# Team: Ant Colony | 
+# Members: Juan Camilo Méndez, Salomé Roldán
 # File: greedy.py — Greedy strategy: follow strongest pheromone
 # ============================================================
 
@@ -17,33 +17,36 @@ def get_neighbors(x, y, grid_size, walls):
     return neighbors
 
 
-def greedy_next(x, y, grid_size, walls, pheromones, visited):
+def greedy_next(x, y, grid_size, walls, pheromones, visited, home=None):
     """
-    Greedy choice: from current position, return the unvisited neighbor
-    with the highest pheromone value.
-    Returns (nx, ny) or None if all neighbors are visited/blocked.
-
-    Complexity: O(k) where k = number of neighbors (max 4)
+    Greedy choice: return the unvisited neighbor with highest pheromone.
+    Uses Manhattan distance to home as tiebreaker only when pheromone is equal.
     """
-    neighbors = get_neighbors(x, y, grid_size, walls)
-    candidates = [(nx, ny) for (nx, ny) in neighbors if (nx, ny) not in visited]
-
+    candidates = greedy_sorted_neighbors(x, y, grid_size, walls, pheromones, visited, home)
     if not candidates:
         return None
-
-    # Sort descending by pheromone value (greedy criterion)
-    candidates.sort(key=lambda pos: pheromones.get(pos, 0.0), reverse=True)
     return candidates[0]
 
 
-def greedy_sorted_neighbors(x, y, grid_size, walls, pheromones, visited):
+def greedy_sorted_neighbors(x, y, grid_size, walls, pheromones, visited, home=None):
     """
-    Return ALL unvisited neighbors sorted by pheromone descending.
-    Used by backtracking to determine the order in which to try candidates.
+    Return ALL unvisited neighbors sorted by:
+      1. Pheromone value descending  (PRIMARY criterion — always dominant)
+      2. Manhattan distance to home ascending  (tiebreaker ONLY when pheromone is identical)
 
-    Complexity: O(k log k)
+    Complexity: O(k log k), k <= 4
     """
     neighbors = get_neighbors(x, y, grid_size, walls)
     candidates = [(nx, ny) for (nx, ny) in neighbors if (nx, ny) not in visited]
-    candidates.sort(key=lambda pos: pheromones.get(pos, 0.0), reverse=True)
+
+    max_dist = grid_size[0] + grid_size[1]  # max possible Manhattan distance
+
+    def sort_key(pos):
+        phero = pheromones.get(pos, 0.0)
+        dist  = abs(pos[0] - home[0]) + abs(pos[1] - home[1]) if home else 0
+        # Normalize distance to [0,1] range so it never overrides pheromone
+        norm_dist = dist / max_dist
+        return (-phero, norm_dist)
+
+    candidates.sort(key=sort_key)
     return candidates

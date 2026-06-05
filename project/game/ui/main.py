@@ -1,11 +1,10 @@
 # ============================================================
-# Team: Ant Colony | Variant 13
-# Members: Juan Camilo Méndez, Jonathan David Moreno, Salomé Roldán
+# Team: Ant Colony | 
+# Members: Juan Camilo Méndez, Salomé Roldán
 # File: main.py — Pygame grid UI + game loop
 # Entry point: python game/ui/main.py
 # ============================================================
-import subprocess
-import json
+
 import pygame
 import sys
 import os
@@ -174,7 +173,7 @@ def draw_hud(surf, gs, buttons, font, font_small):
     title = font.render("ANT COLONY", True, ANT_COL)
     surf.blit(title, (hx + HUD_WIDTH // 2 - title.get_width() // 2, y_cur))
     y_cur += 30
-    sub = font_small.render("Variant 13", True, TEXT_DIM)
+    sub = font_small.render("", True, TEXT_DIM)
     surf.blit(sub, (hx + HUD_WIDTH // 2 - sub.get_width() // 2, y_cur))
     y_cur += 28
 
@@ -349,6 +348,7 @@ def main():
     while running:
         clock.tick(FPS)
         now = time.time()
+
         # Advance animation
         if animating and gs.solved:
             if now - last_step >= ANIM_DELAY:

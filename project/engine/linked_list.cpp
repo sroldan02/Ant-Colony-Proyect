@@ -1,3 +1,8 @@
+// ============================================================
+// Team: Ant Colony | 
+// Members: Juan Camilo Méndez, Salomé Roldán
+// File: linked_list.cpp
+// ============================================================
 
 # include <iostream>
 # include <fstream>

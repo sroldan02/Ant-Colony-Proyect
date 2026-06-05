@@ -1,6 +1,6 @@
 # ============================================================
-# Team: Ant Colony | Variant 13
-# Members: Juan Camilo Méndez, Jonathan David Moreno, Salomé Roldán
+# Team: Ant Colony | 
+# Members: Juan Camilo Méndez, Salomé Roldán
 # File: backtracking.py — Backtracking solver: find path home
 # ============================================================
 
@@ -11,22 +11,13 @@ def solve(start, home, grid_size, walls, pheromones):
     """
     Find a path from start to home using Backtracking + Greedy ordering.
 
-    At each step, neighbors are sorted by pheromone value (greedy heuristic)
-    so the most promising branch is always tried first. If a dead end is
-    reached, the algorithm backtracks and tries the next candidate.
-
-    Parameters:
-        start      : (x, y) tuple — ant's starting position
-        home       : (x, y) tuple — nest position
-        grid_size  : (cols, rows) tuple
-        walls      : set of (x, y) wall positions
-        pheromones : dict {(x,y): float} pheromone values
+    Neighbors are sorted by pheromone (greedy) with Manhattan distance
+    to home as tiebreaker, so the ant always prefers moving toward the
+    nest when pheromone values are equal.
 
     Returns:
-        path       : list of (x, y) tuples from start to home, or []
-        discarded  : set of (x, y) cells that were visited but backtracked
-
-    Complexity: O(b^d) worst case, b = branching factor, d = solution depth
+        path      : list of (x,y) from start to home, or []
+        discarded : set of (x,y) cells that were backtracked
     """
     path      = [start]
     visited   = {start}
@@ -36,7 +27,9 @@ def solve(start, home, grid_size, walls, pheromones):
         if (x, y) == home:
             return True
 
-        candidates = greedy_sorted_neighbors(x, y, grid_size, walls, pheromones, visited)
+        candidates = greedy_sorted_neighbors(
+            x, y, grid_size, walls, pheromones, visited, home=home
+        )
 
         for (nx, ny) in candidates:
             visited.add((nx, ny))
@@ -48,13 +41,8 @@ def solve(start, home, grid_size, walls, pheromones):
             # Dead end — backtrack
             path.pop()
             discarded.add((nx, ny))
-            # Do NOT remove from visited: prevents revisiting dead-end cells
 
         return False
 
     found = _backtrack(*start)
-
-    if found:
-        return path, discarded
-    else:
-        return [], discarded
+    return (path, discarded) if found else ([], discarded)

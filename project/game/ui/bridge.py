@@ -1,6 +1,6 @@
 # ============================================================
-# Team: Ant Colony | Variant 13
-# Members: Juan Camilo Méndez, Jonathan David Moreno, Salomé Roldán
+# Team: Ant Colony | 
+# Members: Juan Camilo Méndez, Salomé Roldán
 # File: bridge.py — JSON bridge: Python <-> C++ communication
 # ============================================================
 

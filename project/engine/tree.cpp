@@ -1,109 +1,80 @@
+// Team: Ant Colony
+// Members: Juan Camilo Méndez, Salomé Roldán
+// File: tree.cpp — BST: Nest resource inventory + visited cells
+
 #include <iostream>
 
-//AVL node structure
-struct AVLNode{
-    int key;
+// BST node structure
+struct BSTNode {
+    int key;              // Unique key: x*1000 + y
     float pheromone_value;
     int x, y;
-    int height;
-    AVLNode * left;
-    AVLNode * right;
+    BSTNode* left;
+    BSTNode* right;
 };
 
-class AVLTree{
+class BSTree {
     private:
-        AVLNode * root;
+        BSTNode* root;
 
-        int max(int a, int b) {
-            return (a > b) ? a : b;
-        }
-
-        int height(AVLNode * node){
-            if (node == nullptr) return 0;
-            return node->height;
-        }
-
-        int Balance(AVLNode * node){
-            if (node == nullptr) return 0;
-            return height(node->left) - height(node->right);
-        }
-
-        AVLNode * rightRotation(AVLNode * y){
-            AVLNode * x  = y->left;
-            AVLNode * T2 = x->right;
-            x->right = y;
-            y->left  = T2;
-            y->height = max(height(y->left), height(y->right)) + 1;
-            x->height = max(height(x->left), height(x->right)) + 1;
-            return x;
-        }
-
-        AVLNode * leftRotation(AVLNode * x){
-            AVLNode * y  = x->right;
-            AVLNode * T2 = y->left;
-            y->left  = x;
-            x->right = T2;
-            x->height = max(height(x->left), height(x->right)) + 1;
-            y->height = max(height(y->left), height(y->right)) + 1;
-            return y;
-        }
-
-        AVLNode * insert(AVLNode * node, int key, float pheromone, int x, int y){
-            if (node == nullptr){
-                AVLNode * newNode = new AVLNode();
-                newNode->key            = key;
+        BSTNode* insert(BSTNode* node, int key, float pheromone, int x, int y) {
+            if (node == nullptr) {
+                BSTNode* newNode = new BSTNode();
+                newNode->key             = key;
                 newNode->pheromone_value = pheromone;
-                newNode->x              = x;
-                newNode->y              = y;
-                newNode->height         = 1;
-                newNode->left           = nullptr;
-                newNode->right          = nullptr;
+                newNode->x               = x;
+                newNode->y               = y;
+                newNode->left            = nullptr;
+                newNode->right           = nullptr;
                 return newNode;
             }
             if      (key < node->key) node->left  = insert(node->left,  key, pheromone, x, y);
             else if (key > node->key) node->right = insert(node->right, key, pheromone, x, y);
-            else return node; // Duplicated key = already visited
-
-            node->height = 1 + max(height(node->left), height(node->right));
-            int balance  = Balance(node);
-
-            // Left-Left
-            if (balance > 1  && key < node->left->key)
-                return rightRotation(node);
-            // Right-Right
-            if (balance < -1 && key > node->right->key)
-                return leftRotation(node);
-            // Left-Right
-            if (balance > 1  && key > node->left->key){
-                node->left = leftRotation(node->left);
-                return rightRotation(node);
-            }
-            // Right-Left
-            if (balance < -1 && key < node->right->key){
-                node->right = rightRotation(node->right);
-                return leftRotation(node);
-            }
+            // Duplicated key: already exists, do nothing
             return node;
         }
 
-        // BST search — returns true if key exists
-        bool search(AVLNode * node, int key){
+        bool search(BSTNode* node, int key) {
             if (node == nullptr)  return false;
             if (key == node->key) return true;
-            if (key <  node->key) return search(node->left,  key);
+            if (key < node->key)  return search(node->left,  key);
             else                  return search(node->right, key);
         }
 
-    public:
-        AVLTree() { root = nullptr; }
+        // Get pheromone value stored for a cell
+        float getPheromone(BSTNode* node, int key) {
+            if (node == nullptr)  return 0.0f;
+            if (key == node->key) return node->pheromone_value;
+            if (key < node->key)  return getPheromone(node->left,  key);
+            else                  return getPheromone(node->right, key);
+        }
 
-        void insertNode(int x, int y, float pheromone = 0.0){
+        void destroy(BSTNode* node) {
+            if (node == nullptr) return;
+            destroy(node->left);
+            destroy(node->right);
+            delete node;
+        }
+
+    public:
+        BSTree()  { root = nullptr; }
+        ~BSTree() { destroy(root);  }
+
+        // Insert a visited cell into the nest resource inventory
+        void insertNode(int x, int y, float pheromone = 0.0) {
             int key = (x * 1000) + y;
             root = insert(root, key, pheromone, x, y);
         }
 
-        bool isVisited(int x, int y){
+        // Check if a cell has already been visited
+        bool isVisited(int x, int y) {
             int key = (x * 1000) + y;
             return search(root, key);
         }
-}; // End AVLTree class
+
+        // Get stored pheromone value for a cell (nest resource lookup)
+        float getResource(int x, int y) {
+            int key = (x * 1000) + y;
+            return getPheromone(root, key);
+        }
+}; // End BSTree class

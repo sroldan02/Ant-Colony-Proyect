@@ -1,3 +1,6 @@
+// Team: Ant Colony
+// Members: Juan Camilo Méndez, Salomé Roldán
+// File: main.cpp
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -26,7 +29,7 @@ struct Candidate {
 };
 
 // Get valid neighbors (not wall, not visited)
-std::vector<Candidate> getNeighbors(int x, int y, AVLTree& visited) {
+std::vector<Candidate> getNeighbors(int x, int y, BSTree& visited) {
     std::vector<Candidate> candidates;
     for (int i = 0; i < 4; i++) {
         int nx = x + dx[i];
@@ -46,7 +49,7 @@ std::vector<Candidate> getNeighbors(int x, int y, AVLTree& visited) {
 
 // Backtracking + Greedy
 // Returns true if path to home was found
-bool solve(int x, int y, int hx, int hy, PathStack& path, AVLTree& visited) {
+bool solve(int x, int y, int hx, int hy, PathStack& path, BSTree& visited) {
     // Mark current as visited
     visited.insertNode(x, y, pheromones[y][x]);
 
@@ -113,7 +116,7 @@ int main(){
 
     // Run algorithm
     PathStack path;
-    AVLTree   visited;
+    BSTree   visited;
 
     path.push(startX, startY);
     bool found = solve(startX, startY, homeX, homeY, path, visited);
